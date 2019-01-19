@@ -1,0 +1,20 @@
+plugins {
+    id 'java'
+}
+
+group 'com.malush.account'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+allprojects {
+    apply plugin: 'java'
+
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        testCompile group: 'junit', name: 'junit', version: '4.12'
+    }
+}
