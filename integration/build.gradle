@@ -2,7 +2,16 @@ plugins {
     id 'java'
 }
 
-group 'com.m2paymentsolutions.account'
+group 'com.malush.account'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
+
+ext {
+    restAssuredVersion = '3.3.0'
+}
+
+//integration tests sub-project specific dependencies
+dependencies {
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: restAssuredVersion 
+}

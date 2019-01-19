@@ -7,6 +7,11 @@ version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
+ext {
+    junitVersion = '4.12'
+    cucumberVersion = '4.2.0'
+}
+
 allprojects {
     apply plugin: 'java'
 
@@ -15,6 +20,8 @@ allprojects {
     }
 
     dependencies {
-        testCompile group: 'junit', name: 'junit', version: '4.12'
+        testCompile group: 'junit', name: 'junit', version: junitVersion
+        testCompile group: 'io.cucumber', name: 'cucumber-java8', version: cucumberVersion
+        testCompile group: 'io.cucumber', name: 'cucumber-junit', version: cucumberVersion
     }
 }
