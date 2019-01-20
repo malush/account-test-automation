@@ -14,8 +14,8 @@ Feature: Sign up
     |inputData |
     |name      |
     |password  |
-#
-#  Scenario: User sign up fails for existing users
-#    Given the user already exists in the system
-#    When a user tries to register a new profile with valid data
-#    Then the user sign up fails with appropriate error message
+
+  Scenario: User sign up fails for existing users
+    Given the user already exists in the system
+    When a user tries to register a new profile with valid data
+    Then the user sign up fails with response indicating the conflict

@@ -6,7 +6,6 @@ import cucumber.api.java8.En;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
-import io.restassured.specification.RequestSpecification;
 import org.apache.http.HttpStatus;
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
@@ -15,13 +14,11 @@ import static io.restassured.RestAssured.*;
 
 public class SignUpSteps implements En {
 
-  private RequestSpecification request;
   private Response response;
   public SignUpSteps() {
 
     After(() -> {
       UserRepository.getRepository().deleteAll();
-      request = null;
       response = null;
     });
 
@@ -30,8 +27,7 @@ public class SignUpSteps implements En {
         given().
           contentType(ContentType.JSON).
           body(new SignUpRequest("malush", "qwerty123")).
-        when().
-          post("/sign-up");
+        when().post("/sign-up");
     });
 
     Then("the user sign up is successful", () -> {
@@ -49,14 +45,25 @@ public class SignUpSteps implements En {
           given().
             contentType(ContentType.JSON).
             body(signUpRequest).
-          when().
-            post("/sign-up");
-
+          when().post("/sign-up");
     });
 
     Then("the user sign up fails with Bad Request response", () -> {
       JsonPath jsonPath = response.then().statusCode(HttpStatus.SC_BAD_REQUEST).extract().jsonPath();
       assertThat(jsonPath.get("error"), is("Bad Request"));
+    });
+
+    Given("the user already exists in the system", () ->
+    {
+      given().
+        contentType(ContentType.JSON).
+        body(new SignUpRequest("malush", "qwerty123")).
+      when().post("/sign-up").
+      then().statusCode(HttpStatus.SC_CREATED);
+    });
+
+    Then("the user sign up fails with response indicating the conflict", () -> {
+      response.then().statusCode(HttpStatus.SC_CONFLICT);
     });
 
   }
