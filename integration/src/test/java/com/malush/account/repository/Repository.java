@@ -13,6 +13,8 @@ package com.malush.account.repository;
 public interface Repository {
 
 
-  public void deleteAll() throws Exception;
+  public void deleteAll();
+
+  public void closeConnection();
 
 }

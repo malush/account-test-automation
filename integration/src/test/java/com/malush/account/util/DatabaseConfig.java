@@ -1,6 +1,6 @@
 package com.malush.account.util;
 
-public class Database {
+public class DatabaseConfig {
 
   private String connectionUrl;
   private String username;

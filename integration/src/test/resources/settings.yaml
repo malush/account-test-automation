@@ -1,5 +1,8 @@
-environments:
-  database:
-    connectionUrl: jdbc:postgresql://localhost:5432/postgres
-    username: postgres
-    password: postgres
+databaseConfig:
+  connectionUrl: jdbc:postgresql://localhost:5432/postgres
+  username: postgres
+  password: postgres
+
+webConfig:
+  baseUri: http://localhost
+  port: 8095

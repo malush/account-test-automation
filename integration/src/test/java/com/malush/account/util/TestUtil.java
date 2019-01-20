@@ -6,27 +6,27 @@ import java.util.Optional;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-public class TestSupport {
-  private static Environments environments;
+public class TestUtil {
+  private static Settings settings;
 
-  public static Environments getEnvironments()
+  public static Settings getSettings()
   {
-    if(environments == null)
+    if(settings == null)
       loadSettings();
-    return environments;
+    return settings;
   }
 
   private static synchronized void loadSettings() {
-    if (environments != null)
+    if (settings != null)
       return;
 
     Constructor constructor = new Constructor(Settings.class);
     Yaml yaml = new Yaml(constructor);
 
-    try (InputStream inputStream = TestSupport.class.getClassLoader().getResourceAsStream("settings.yaml")) {
+    try (InputStream inputStream = TestUtil.class.getClassLoader().getResourceAsStream("settings.yaml")) {
       Optional.of(yaml.loadAs(inputStream, Settings.class))
-          .ifPresent(settings -> {
-            environments = settings.getEnvironments();
+          .ifPresent(parsedSettings -> {
+            settings = parsedSettings;
           });
     } catch (IOException e) {
       e.printStackTrace();
