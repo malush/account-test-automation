@@ -1,11 +1,11 @@
-package com.malush.account.model;
+package com.malush.account.requests;
 
-public class User {
+public class SignUpRequest {
 
   private String name;
   private String password;
 
-  public User(String name, String password) {
+  public SignUpRequest(String name, String password) {
     this.name = name;
     this.password = password;
   }

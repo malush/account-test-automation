@@ -1,7 +1,7 @@
 package com.malush.account.repository;
 
-import com.malush.account.util.DatabaseConfig;
-import com.malush.account.util.TestUtil;
+import com.malush.util.DatabaseConfig;
+import com.malush.util.TestUtil;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;

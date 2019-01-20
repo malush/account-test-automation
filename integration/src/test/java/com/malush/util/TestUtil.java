@@ -1,4 +1,4 @@
-package com.malush.account.util;
+package com.malush.util;
 
 import java.io.IOException;
 import java.io.InputStream;
