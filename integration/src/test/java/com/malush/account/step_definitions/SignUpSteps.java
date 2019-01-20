@@ -15,6 +15,7 @@ import static io.restassured.RestAssured.*;
 public class SignUpSteps implements En {
 
   private Response response;
+
   public SignUpSteps() {
 
     After(() -> {
