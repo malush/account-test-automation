@@ -1,8 +1,0 @@
-plugins {
-    id 'java'
-}
-
-group 'com.m2paymentsolutions.account'
-version '1.0-SNAPSHOT'
-
-sourceCompatibility = 1.8

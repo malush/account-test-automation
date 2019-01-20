@@ -1,17 +1,15 @@
-plugins {
-    id 'java'
-}
-
-group 'com.malush.account'
 version '1.0-SNAPSHOT'
 
 sourceCompatibility = 1.8
 
 ext {
     restAssuredVersion = '3.3.0'
+    postgredriverVersion = '42.2.5'
 }
 
 //integration tests sub-project specific dependencies
 dependencies {
-    testCompile group: 'io.rest-assured', name: 'rest-assured', version: restAssuredVersion 
+    testCompile group: 'io.rest-assured', name: 'rest-assured', version: restAssuredVersion
+    testCompile group: 'io.rest-assured', name: 'json-schema-validator', version: restAssuredVersion
+    testCompile group: 'org.postgresql', name: 'postgresql', version: postgredriverVersion
 }

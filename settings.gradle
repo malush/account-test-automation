@@ -1,3 +1,2 @@
 rootProject.name = 'account-test-automation'
-include 'functional'
-include 'integration'
+include 'functional', 'integration'
