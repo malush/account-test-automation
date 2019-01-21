@@ -25,3 +25,10 @@ Feature: Account
   Scenario: Invalid token
     When the user tries to create a new account but provides an invalid token
     Then the access to account resource is forbidden
+
+  Scenario: Account exists
+    Given the account already exists in the system
+    When the user tries to create a new account with valid data
+    Then the account creation fails with the response indicating the conflict
+
+    #account currency not supported / or validation error

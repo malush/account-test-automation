@@ -2,7 +2,7 @@ package com.malush.account;
 
 import com.malush.account.repository.AccountRepository;
 import com.malush.account.repository.UserRepository;
-import com.malush.util.TestUtil;
+import com.malush.util.settings.SettingsUtil;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import io.restassured.RestAssured;
@@ -22,8 +22,8 @@ public class TestRunner {
 
   @BeforeClass
   public static void setup() {
-    RestAssured.port = TestUtil.getSettings().getWebConfig().getPort();
-    RestAssured.baseURI = TestUtil.getSettings().getWebConfig().getBaseUri();
+    RestAssured.port = SettingsUtil.getSettings().getWebConfig().getPort();
+    RestAssured.baseURI = SettingsUtil.getSettings().getWebConfig().getBaseUri();
   }
 
   @AfterClass

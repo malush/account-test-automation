@@ -1,4 +1,4 @@
-package com.malush.util;
+package com.malush.util.settings;
 
 public class DatabaseConfig {
 

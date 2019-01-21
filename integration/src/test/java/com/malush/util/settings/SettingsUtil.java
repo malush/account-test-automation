@@ -1,4 +1,4 @@
-package com.malush.util;
+package com.malush.util.settings;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -6,7 +6,7 @@ import java.util.Optional;
 import org.yaml.snakeyaml.Yaml;
 import org.yaml.snakeyaml.constructor.Constructor;
 
-public class TestUtil {
+public class SettingsUtil {
   private static Settings settings;
 
   public static Settings getSettings()
@@ -23,7 +23,7 @@ public class TestUtil {
     Constructor constructor = new Constructor(Settings.class);
     Yaml yaml = new Yaml(constructor);
 
-    try (InputStream inputStream = TestUtil.class.getClassLoader().getResourceAsStream("settings.yaml")) {
+    try (InputStream inputStream = SettingsUtil.class.getClassLoader().getResourceAsStream("settings.yaml")) {
       Optional.of(yaml.loadAs(inputStream, Settings.class))
           .ifPresent(parsedSettings -> {
             settings = parsedSettings;

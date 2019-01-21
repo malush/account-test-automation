@@ -1,7 +1,7 @@
 package com.malush.account.repository;
 
-import com.malush.util.DatabaseConfig;
-import com.malush.util.TestUtil;
+import com.malush.util.settings.DatabaseConfig;
+import com.malush.util.settings.SettingsUtil;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -23,7 +23,7 @@ public class AccountRepository extends SQLRepository {
 
   private AccountRepository() {
     //should be getAccountDatabaseConfig() if there is a separate account store
-    DatabaseConfig dbConfig = TestUtil.getSettings().getDatabaseConfig();
+    DatabaseConfig dbConfig = SettingsUtil.getSettings().getDatabaseConfig();
     try {
       this.connection = DriverManager.getConnection(
           dbConfig.getConnectionUrl(),

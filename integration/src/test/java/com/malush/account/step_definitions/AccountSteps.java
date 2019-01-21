@@ -107,5 +107,18 @@ public class AccountSteps implements En {
           post("/accounts");
     });
 
+    Given("the account already exists in the system", () -> {
+        given().
+          contentType(ContentType.JSON).
+          header("X-access-token", "Bearer " + accessToken).
+          body(createAccountRequest).
+        when().
+          post("/accounts");
+    });
+
+    Then("the account creation fails with the response indicating the conflict", () -> {
+      response.then().statusCode(HttpStatus.SC_CONFLICT);
+    });
+
   }
 }
