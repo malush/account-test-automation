@@ -2,7 +2,6 @@ package com.malush.account.repository;
 
 import com.malush.util.DatabaseConfig;
 import com.malush.util.TestUtil;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -23,7 +22,6 @@ public class AccountRepository extends SQLRepository {
   }
 
   private AccountRepository() {
-    super(DELETE_ALL_ACCOUNTS);
     //should be getAccountDatabaseConfig() if there is a separate account store
     DatabaseConfig dbConfig = TestUtil.getSettings().getDatabaseConfig();
     try {
@@ -35,5 +33,10 @@ public class AccountRepository extends SQLRepository {
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  protected String deleteAllQuery() {
+    return DELETE_ALL_ACCOUNTS;
   }
 }

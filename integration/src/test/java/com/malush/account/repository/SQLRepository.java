@@ -1,21 +1,19 @@
 package com.malush.account.repository;
 import java.sql.Connection;
 
+/**
+ * {@inheritDoc}
+ */
 public abstract class SQLRepository implements Repository {
-
-  private final String DELETE_ALL;
 
   protected Connection connection;
 
-  protected SQLRepository(String DELETE_ALL) {
-    this.DELETE_ALL = DELETE_ALL;
-  }
-
+  protected abstract String deleteAllQuery();
 
   @Override
   public void deleteAll(){
     try{
-      connection.prepareStatement(DELETE_ALL).execute();
+      connection.prepareStatement(deleteAllQuery()).execute();
     }
     catch (Exception e) {
       e.printStackTrace();

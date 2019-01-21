@@ -24,7 +24,6 @@ public class UserRepository extends SQLRepository{
   }
 
   private UserRepository() {
-    super(DELETE_ALL_USERS);
 
     //should be getUserDatabaseConfig if there is a separate user store
     DatabaseConfig dbConfig = TestUtil.getSettings().getDatabaseConfig();
@@ -37,5 +36,10 @@ public class UserRepository extends SQLRepository{
     } catch (SQLException e) {
       e.printStackTrace();
     }
+  }
+
+  @Override
+  protected String deleteAllQuery() {
+    return DELETE_ALL_USERS;
   }
 }
