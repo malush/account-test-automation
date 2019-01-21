@@ -34,7 +34,8 @@ public class LoginSteps implements En {
     });
 
     Then("the access is granted", () -> {
-      response.then().statusCode(HttpStatus.SC_OK).log().all();
+      response.then().statusCode(HttpStatus.SC_OK);
+      assertNotNull(response.jsonPath().get("access_token"));
     });
 
     When("a user successfully signs up", () -> {
