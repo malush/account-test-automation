@@ -79,8 +79,8 @@ public class AccountSteps implements En {
     });
 
     Then("the account creation fails with Bad Request response", () -> {
-      JsonPath jsonPath = response.then().statusCode(HttpStatus.SC_BAD_REQUEST).extract().jsonPath();
-      assertThat(jsonPath.get("error"), is("Bad Request"));
+      response.then().statusCode(HttpStatus.SC_BAD_REQUEST);
+      assertThat(response.jsonPath().get("error"), is("Bad Request"));
     });
 
     When("the user tries to create a new account without providing access token", () -> {
@@ -118,6 +118,16 @@ public class AccountSteps implements En {
 
     Then("the account creation fails with the response indicating the conflict", () -> {
       response.then().statusCode(HttpStatus.SC_CONFLICT);
+    });
+
+    When("the user tries to create a new account with invalid currency", () -> {
+      response =
+        given().
+          contentType(ContentType.JSON).
+          header("X-access-token", "Bearer " + accessToken).
+          body(new CreateAccountRequest("Ivan Malusev", "XYZ")).
+        when().
+          post("/accounts");
     });
 
   }

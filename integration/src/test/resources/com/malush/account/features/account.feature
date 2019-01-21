@@ -31,4 +31,6 @@ Feature: Account
     When the user tries to create a new account with valid data
     Then the account creation fails with the response indicating the conflict
 
-    #account currency not supported / or validation error
+  Scenario: Invalid currency
+    When the user tries to create a new account with invalid currency
+    Then the account creation fails with Bad Request response
