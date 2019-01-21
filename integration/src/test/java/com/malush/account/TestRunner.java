@@ -1,11 +1,11 @@
 package com.malush.account;
 
+import com.malush.account.repository.AccountRepository;
 import com.malush.account.repository.UserRepository;
 import com.malush.util.TestUtil;
 import cucumber.api.CucumberOptions;
 import cucumber.api.junit.Cucumber;
 import io.restassured.RestAssured;
-import io.restassured.config.HttpClientConfig;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
@@ -24,11 +24,13 @@ public class TestRunner {
   public static void setup() {
     RestAssured.port = TestUtil.getSettings().getWebConfig().getPort();
     RestAssured.baseURI = TestUtil.getSettings().getWebConfig().getBaseUri();
-    //RestAssured.config = RestAssured.config().httpClient(HttpClientConfig.httpClientConfig().reuseHttpClientInstance());
   }
 
   @AfterClass
   public static void shutdown() {
+    AccountRepository.getRepository().deleteAll();
+    AccountRepository.getRepository().closeConnection();
+    UserRepository.getRepository().deleteAll();
     UserRepository.getRepository().closeConnection();
   }
 }

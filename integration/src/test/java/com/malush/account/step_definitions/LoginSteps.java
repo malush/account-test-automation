@@ -17,8 +17,11 @@ public class LoginSteps implements En {
 
   public LoginSteps() {
 
-    After(() -> {
+    Before(() -> {
       UserRepository.getRepository().deleteAll();
+    });
+
+    After(() -> {
       response = null;
     });
 

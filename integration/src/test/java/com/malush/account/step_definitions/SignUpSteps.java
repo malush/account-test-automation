@@ -18,8 +18,11 @@ public class SignUpSteps implements En {
 
   public SignUpSteps() {
 
-    After(() -> {
+    Before(() -> {
       UserRepository.getRepository().deleteAll();
+    });
+
+    After(() -> {
       response = null;
     });
 
