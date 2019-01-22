@@ -8,10 +8,10 @@ import com.malush.account.repository.AccountRepository;
 import com.malush.account.repository.UserRepository;
 import com.malush.account.requests.ApiPath;
 import com.malush.account.requests.CreateAccountRequest;
-import com.malush.account.requests.CreateAccountRequest.SupportedCurrencies;
 import com.malush.account.requests.SignUpRequest;
 import cucumber.api.java8.En;
 import io.restassured.http.ContentType;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import java.util.Currency;
 import java.util.UUID;
@@ -22,6 +22,7 @@ public class AccountSteps implements En {
   private Response response;
   private String accessToken;
   private CreateAccountRequest createAccountRequest;
+  private long accountId;
 
   public AccountSteps() {
 
@@ -34,6 +35,7 @@ public class AccountSteps implements En {
       response = null;
       accessToken = null;
       createAccountRequest = null;
+      accountId = 0L;
     });
 
     Given("the user is logged in", () -> {
@@ -96,12 +98,13 @@ public class AccountSteps implements En {
     });
 
     Given("the account with account details: {string} and {string} already exists", (String nameOnAccount, String currencyId) -> {
+      accountId =
         given().
           contentType(ContentType.JSON).
           header("X-access-token", "Bearer " + accessToken).
           body(createAccountRequestBody(nameOnAccount, currencyId)).
         when().
-          post(ApiPath.ACCOUNTS);
+          post(ApiPath.ACCOUNTS).jsonPath().getLong("id");
     });
 
     Then("the account creation fails with the response indicating the conflict", () -> {
@@ -118,6 +121,25 @@ public class AccountSteps implements En {
           body(new CreateAccountRequest(nameOnAccount, Currency.getInstance(supportedCurrency).getCurrencyCode())).
         when().
           post("/accounts");
+    });
+
+    When("the user tries to get the account", () -> {
+      response =
+        given().
+          contentType(ContentType.JSON).
+          header("X-access-token", "Bearer " + accessToken).
+        when().
+          get(ApiPath.ACCOUNTS + "/" + accountId);
+    });
+
+    Then("the users account is successfully retrieved", () -> {
+      response.then().statusCode(HttpStatus.SC_OK);
+    });
+
+    Then("the account has the following details: {string} and {string}", (String nameOnAccount, String currencyId) -> {
+      JsonPath jsonPath =  response.then().extract().jsonPath();
+      assertThat(jsonPath.get("nameOnAccount"), is(nameOnAccount));
+      assertThat(jsonPath.get("currencyId"), is(currencyId));
     });
   }
 

@@ -1,6 +1,6 @@
-Feature: Account
+Feature: Create account
   As an existing user of the system
-  I want to be able to manage my account
+  I want to be able to create an account
 
   Background:
     Given the user is logged in
@@ -72,5 +72,4 @@ Feature: Account
       #|RSD              |
       #Currently all currencies are supported (for example, just uncomment the line above and this
       #scenario will still not fail although it should).
-      #After the issue is fixed we should only have EUR in the list
-
+      #After the issue is fixed this should only work for EUR but for any other currency it would fail
