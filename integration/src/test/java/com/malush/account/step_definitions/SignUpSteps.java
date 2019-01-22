@@ -16,7 +16,7 @@ import static io.restassured.RestAssured.*;
 public class SignUpSteps implements En {
 
   private Response response;
-  private SignUpRequest signUpRequest;
+  private SignUpRequest signUpRequestBody;
 
   public SignUpSteps() {
 
@@ -26,18 +26,18 @@ public class SignUpSteps implements En {
 
     After(() -> {
       response = null;
-      signUpRequest = null;
+      signUpRequestBody = null;
     });
 
     Given("the user inserts {string} and {string}", (String name, String password) -> {
-      signUpRequest = new SignUpRequest(name.equals("null") ? null : name, password.equals("null") ? null : password);
+      signUpRequestBody = new SignUpRequest(name.equals("null") ? null : name, password.equals("null") ? null : password);
     });
 
     When("the user tries to register a new profile", () -> {
       response =
         given().
           contentType(ContentType.JSON).
-          body(signUpRequest).
+          body(signUpRequestBody).
         when().post(ApiPath.SIGN_UP);
     });
 
@@ -52,12 +52,12 @@ public class SignUpSteps implements En {
 
     Given("the user with {string} and {string} already exists in the system", (String name, String password) ->
     {
-      signUpRequest = new SignUpRequest(name.equals("null") ? null : name, password.equals("null") ? null : password);
+      signUpRequestBody = new SignUpRequest(name.equals("null") ? null : name, password.equals("null") ? null : password);
       given().
         contentType(ContentType.JSON).
-        body(signUpRequest).log().all().
+        body(signUpRequestBody).
       when().post(ApiPath.SIGN_UP).
-      then().statusCode(HttpStatus.SC_CREATED).log().all();
+      then().statusCode(HttpStatus.SC_CREATED);
     });
 
     Then("the user sign up fails with response indicating the conflict", () -> {

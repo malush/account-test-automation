@@ -1,19 +1,21 @@
 package com.malush.account.step_definitions;
 
 import com.malush.account.repository.UserRepository;
-import com.malush.account.requests.SignUpRequest;
+import com.malush.account.requests.ApiPath;
+import com.malush.account.requests.LoginRequest;
 import cucumber.api.java8.En;
 import static io.restassured.RestAssured.*;
 
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import org.apache.http.HttpStatus;
-import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.*;
 
 public class LoginSteps implements En {
 
   private Response response;
+  private LoginRequest loginRequestBody;
+
 
   public LoginSteps() {
 
@@ -23,14 +25,23 @@ public class LoginSteps implements En {
 
     After(() -> {
       response = null;
+      loginRequestBody = null;
+    });
+    
+    Given("the user inserts login credentials: {string} and {string}", (String name, String password) -> {
+      loginRequestBody = createLoginRequestBody(name, password);
     });
 
-    When("the user requests to login and have the full access to the system", () -> {
+    When("the user requests to login", () -> {
       response =
         given().
           contentType(ContentType.JSON).
-          body(new SignUpRequest("malush", "qwerty123")).
-        when().post("/access-tokens");
+          body(loginRequestBody).
+        when().post(ApiPath.ACCESS_TOKENS);
+    });
+
+    Given("an unknown user inserts login credentials", () -> {
+      loginRequestBody = createLoginRequestBody("unknown", "unknown");
     });
 
     Then("the access is granted", () -> {
@@ -42,9 +53,9 @@ public class LoginSteps implements En {
       response =
         given().
           contentType(ContentType.JSON).
-          body(new SignUpRequest("malush", "qwerty123")).
+          body(createLoginRequestBody("malush", "qwerty123")).
         when().
-          post("/sign-up").
+          post(ApiPath.SIGN_UP).
         then().
           statusCode(HttpStatus.SC_CREATED).extract().response();
     });
@@ -56,31 +67,9 @@ public class LoginSteps implements En {
     Then("the access is forbidden", () -> {
       response.then().statusCode(HttpStatus.SC_FORBIDDEN);
     });
+  }
 
-    When("the user requests to login with a wrong password", () -> {
-      response =
-        given().
-          contentType(ContentType.JSON).
-          body(new SignUpRequest("malush", "wrongPassword")).
-        when().
-          post("/access_token");
-    });
-
-    When("the user requests to login with missing {string}", (String inputData) -> {
-      SignUpRequest signUpRequest;
-      if(inputData.equals("name"))
-        signUpRequest = new SignUpRequest(null, "qwerty123");
-      else if (inputData.equals("password")){
-        signUpRequest = new SignUpRequest("malush", null);
-      } else {
-        signUpRequest = new SignUpRequest(null, null);
-      }
-      response =
-        given().
-          contentType(ContentType.JSON).
-          body(signUpRequest).
-        when().post("/access_token");
-    });
-
+  private LoginRequest createLoginRequestBody(String name, String password) {
+    return new LoginRequest(name.equals("null") ? null : name, password.equals("null") ? null : password);
   }
 }

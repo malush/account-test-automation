@@ -7,5 +7,6 @@ package com.malush.account.requests;
 public final class ApiPath {
 
   public static final String SIGN_UP = "/sign-up";
+  public static final String ACCESS_TOKENS = "access-tokens";
 
 }
