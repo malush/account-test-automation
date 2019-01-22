@@ -116,6 +116,14 @@ public class AccountSteps implements En {
       response.then().statusCode(HttpStatus.SC_CONFLICT);
     });
 
+    When("the user chooses the wrong account number", () -> {
+      accountId = 0;
+    });
+
+    Then("the account cannot be found", () -> {
+      response.then().statusCode(HttpStatus.SC_NOT_FOUND);
+    });
+
     When("the user tries to add a new account for one of the supported currencies: {string}", (String supportedCurrency) -> {
       // need to add a random value since the system doesn't support a single account with multiple currencies
       String nameOnAccount = UUID.randomUUID().toString();

@@ -15,6 +15,14 @@ Feature: Get account
       |nameOnAccount|currencyId |
       |Ivan Malusev |EUR        |
 
+  #In addition to the following scenario we need another one.
+  #The user should only be able to fetch his own account, but this feature is currently not supported
+  #Unless the application is only admin facing?
+  Scenario: Fail to get unknown account
+    Given the user chooses the wrong account number
+    When the user tries to get the account
+    Then the account cannot be found
+
   Scenario: Check account response fields
     Given the account with account details: 'test' and 'EUR' already exists
     When the user tries to get the account
