@@ -11,8 +11,9 @@ import com.malush.account.requests.CreateAccountRequest.SupportedCurrencies;
 import com.malush.account.requests.SignUpRequest;
 import cucumber.api.java8.En;
 import io.restassured.http.ContentType;
-import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import java.util.Currency;
+import java.util.UUID;
 import org.apache.http.HttpStatus;
 
 public class AccountSteps implements En {
@@ -130,5 +131,26 @@ public class AccountSteps implements En {
           post("/accounts");
     });
 
+    When("the user tries to add a new currency to existing account", () -> {
+      response =
+          given().
+            contentType(ContentType.JSON).
+            header("X-access-token", "Bearer " + accessToken).
+            body(new CreateAccountRequest("Ivan Malusev", "RSD")).
+          when().
+            post("/accounts");
+    });
+
+    When("the user tries to add a new account for one of the supported currencies: {string}", (String supportedCurrency) -> {
+      // need to add a random value since the system doesn't support a single account with multiple currencies
+      String nameOnAccount = UUID.randomUUID().toString();
+      response =
+        given().
+          contentType(ContentType.JSON).
+          header("X-access-token", "Bearer " + accessToken).
+          body(new CreateAccountRequest(nameOnAccount, Currency.getInstance(supportedCurrency).getCurrencyCode())).
+        when().
+          post("/accounts");
+    });
   }
 }
