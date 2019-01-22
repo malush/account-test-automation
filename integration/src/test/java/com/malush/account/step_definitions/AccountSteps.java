@@ -6,6 +6,7 @@ import static org.junit.Assert.assertThat;
 
 import com.malush.account.repository.AccountRepository;
 import com.malush.account.repository.UserRepository;
+import com.malush.account.requests.ApiPath;
 import com.malush.account.requests.CreateAccountRequest;
 import com.malush.account.requests.CreateAccountRequest.SupportedCurrencies;
 import com.malush.account.requests.SignUpRequest;
@@ -27,7 +28,6 @@ public class AccountSteps implements En {
     Before(() -> {
       AccountRepository.getRepository().deleteAll();
       UserRepository.getRepository().deleteAll();
-      createAccountRequest = new CreateAccountRequest("Ivan Malusev", SupportedCurrencies.EUR.getIso4217Code());
     });
 
     After(() -> {
@@ -36,47 +36,34 @@ public class AccountSteps implements En {
       createAccountRequest = null;
     });
 
-    And("the user is logged in", () -> {
+    Given("the user is logged in", () -> {
       accessToken =
         given().
           contentType(ContentType.JSON).
           body(new SignUpRequest("malush", "qwerty123")).
         when().
-          post("/access-tokens").
+          post(ApiPath.SIGN_UP).
         then().
+          statusCode(HttpStatus.SC_CREATED).
           extract().jsonPath().get("access_token");
     });
 
-    When("the user tries to create a new account with valid data", () -> {
+    Given("the user inserts account details: {string} and {string}", (String nameOnAccount, String currency) -> {
+      createAccountRequest = createAccountRequestBody(nameOnAccount, currency);
+    });
+
+    When("the user tries to create a new account", () -> {
       response =
         given().
           contentType(ContentType.JSON).
           header("X-access-token", "Bearer " + accessToken).
           body(createAccountRequest).
         when().
-          post("/accounts");
+          post(ApiPath.ACCOUNTS);
     });
 
     Then("the new account is successfully created", () -> {
       response.then().statusCode(HttpStatus.SC_CREATED);
-    });
-
-    When("the user tries to create a new account with missing {string}", (String inputData) -> {
-      CreateAccountRequest createAccountRequest;
-      if (inputData.equals("nameOnAccount")) {
-        createAccountRequest = new CreateAccountRequest(null,
-            SupportedCurrencies.EUR.getIso4217Code());
-      } else {
-        createAccountRequest = new CreateAccountRequest("Ivan Malusev", null);
-      }
-
-      response =
-        given().
-          contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + accessToken).
-          body(createAccountRequest).
-        when().
-          post("/accounts");
     });
 
     Then("the account creation fails with Bad Request response", () -> {
@@ -88,9 +75,9 @@ public class AccountSteps implements En {
       response =
         given().
           contentType(ContentType.JSON).
-          body(createAccountRequest).
+          body(createAccountRequestBody("test", "EUR")).
         when().
-          post("/accounts");
+          post(ApiPath.ACCOUNTS);
     });
 
     Then("the access to account resource is forbidden", () -> {
@@ -103,42 +90,22 @@ public class AccountSteps implements En {
         given().
           contentType(ContentType.JSON).
           header("X-access-token", "Bearer " + "wrongtoken").
-          body(createAccountRequest).
+          body(createAccountRequestBody("test", "EUR")).
         when().
-          post("/accounts");
+          post(ApiPath.ACCOUNTS);
     });
 
-    Given("the account already exists in the system", () -> {
+    Given("the account with account details: {string} and {string} already exists", (String nameOnAccount, String currencyId) -> {
         given().
           contentType(ContentType.JSON).
           header("X-access-token", "Bearer " + accessToken).
-          body(createAccountRequest).
+          body(createAccountRequestBody(nameOnAccount, currencyId)).
         when().
-          post("/accounts");
+          post(ApiPath.ACCOUNTS);
     });
 
     Then("the account creation fails with the response indicating the conflict", () -> {
       response.then().statusCode(HttpStatus.SC_CONFLICT);
-    });
-
-    When("the user tries to create a new account with invalid currency", () -> {
-      response =
-        given().
-          contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + accessToken).
-          body(new CreateAccountRequest("Ivan Malusev", "XYZ")).
-        when().
-          post("/accounts");
-    });
-
-    When("the user tries to add a new currency to existing account", () -> {
-      response =
-          given().
-            contentType(ContentType.JSON).
-            header("X-access-token", "Bearer " + accessToken).
-            body(new CreateAccountRequest("Ivan Malusev", "RSD")).
-          when().
-            post("/accounts");
     });
 
     When("the user tries to add a new account for one of the supported currencies: {string}", (String supportedCurrency) -> {
@@ -152,5 +119,12 @@ public class AccountSteps implements En {
         when().
           post("/accounts");
     });
+  }
+
+  private CreateAccountRequest createAccountRequestBody(String nameOnAccount, String currency){
+    return new CreateAccountRequest(
+        nameOnAccount.equals("null") ? null : nameOnAccount,
+        currency.equals("null") ? null : currency
+    );
   }
 }
