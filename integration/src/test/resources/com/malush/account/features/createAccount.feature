@@ -24,15 +24,15 @@ Feature: Create account
       |null         |null       |
       |             |           |
 
-  Scenario: Missing token
+  Scenario: Fail if token is missing
     When the user tries to create a new account without providing access token
     Then the access to account resource is forbidden
 
-  Scenario: Invalid token
+  Scenario: Fail if token is invalid
     When the user tries to create a new account but provides an invalid token
     Then the access to account resource is forbidden
 
-  Scenario Outline: Account exists
+  Scenario Outline: Fail if account exists
     Given the account with account details: '<nameOnAccount>' and '<currencyId>' already exists
     And the user inserts account details: '<nameOnAccount>' and '<currencyId>'
     When the user tries to create a new account
@@ -41,12 +41,12 @@ Feature: Create account
       |nameOnAccount|currencyId |
       |Ivan Malusev |EUR        |
 
-  Scenario: Invalid currency
+  Scenario: Fail for invalid currency
     Given the user inserts account details: 'Ivan Malusev' and 'XYZ'
     When the user tries to create a new account
     Then the account creation fails with Bad Request response
 
-  Scenario Outline: Multiple currencies on one account
+  Scenario Outline: Fail multiple currencies on one account
     Given the account with account details: '<nameOnAccount>' and '<currencyId1>' already exists
     And the user inserts account details: '<nameOnAccount>' and '<currencyId2>'
     When the user tries to create a new account
@@ -63,7 +63,7 @@ Feature: Create account
   # Line 22: should change from: if(!StringUtils.isBlank(value) || "EUR".equals(value))
   # to if(!StringUtils.isBlank(value) && "EUR".equals(value))
   # as the line 22 doesn't make any sense. It will always be true for any non empty value
-  Scenario Outline: Supported currencies
+  Scenario Outline: Check supported currencies
     When the user tries to add a new account for one of the supported currencies: '<supportedCurrency>'
     Then the new account is successfully created
     Examples:
@@ -74,10 +74,10 @@ Feature: Create account
       #scenario will still not fail although it should).
       #After the issue is fixed this should only work for EUR but for any other currency it would fail
 
-  Scenario Outline: Test optional fields
+  Scenario Outline: Check supported optional fields
     Given the user inserts account details: 'Ivan Malusev' and 'EUR'
     And the request account type value is '<accountType>'
-    And the request account balance value is '<balance>'
+    And the request balance value is '<balance>'
     And the request balance status is '<balanceStatus>'
     When the user tries to create a new account
     Then the account creation reply status code is <statusCode>

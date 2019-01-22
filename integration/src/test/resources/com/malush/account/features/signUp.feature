@@ -11,7 +11,7 @@ Feature: Sign up
       |name   |password  |
       |malush |qwerty123 |
 
-  Scenario Outline: Missing or empty fields
+  Scenario Outline: Fail if required fields are empty or missing
     Given the user inserts '<name>' and '<password>'
     When the user tries to register a new profile
     Then the user sign up fails with Bad Request response
@@ -22,7 +22,7 @@ Feature: Sign up
       | malush | null      |
       | malush |           |
 
-  Scenario Outline: User sign up fails for existing users
+  Scenario Outline: Fail for existing users
     Given the user with '<name>' and '<password>' already exists in the system
     When the user tries to register a new profile
     Then the user sign up fails with response indicating the conflict

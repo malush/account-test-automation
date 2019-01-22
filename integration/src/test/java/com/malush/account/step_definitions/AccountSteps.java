@@ -160,7 +160,7 @@ public class AccountSteps implements En {
           body("$", hasKey("nameOnAccount"));
     });
 
-    Given("the request account balance value is {string}", (String balance) -> {
+    Given("the request balance value is {string}", (String balance) -> {
       if(!balance.equals("missing") && !balance.isEmpty())
         createAccountRequest.setBalance(new BigDecimal(balance));
     });
@@ -194,6 +194,21 @@ public class AccountSteps implements En {
 
     Then("the account creation reply status code is {int}", (Integer statusCode) -> {
       response.then().statusCode(statusCode);
+    });
+
+    Then("the created values for {string}, {string} and {string} are correct", (String accountType, String balance, String balanceStatus) -> {
+      JsonPath jsonPath =
+          given().
+            contentType(ContentType.JSON).
+            header(HEADER_ACCESS_TOKEN, "Bearer " + accessToken).
+          when().
+            get(ApiPath.ACCOUNTS + "/" + accountId).
+          then().
+            statusCode(HttpStatus.SC_OK).extract().jsonPath();
+
+      assertThat(jsonPath.get("accountType"), is(accountType));
+      assertThat(jsonPath.get("balance"), is(new BigDecimal(balance).setScale(2, BigDecimal.ROUND_DOWN).toString()));
+      assertThat(jsonPath.get("balanceStatus"), is(balanceStatus));
     });
   }
 

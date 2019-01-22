@@ -21,9 +21,9 @@ Feature: Get account
     Then the users account is successfully retrieved
     And the account response contains all required fields
 
-  Scenario Outline: Initial balance for new accounts
+  Scenario Outline: Check initial balance for new accounts
     Given the user inserts account details: 'Ivan Malusev' and 'EUR'
-    And the request account balance value is '<balance>'
+    And the request balance value is '<balance>'
     When the user tries to create a new account
     Then the new account is successfully created
     And the account balance is '<balance>'
@@ -31,3 +31,15 @@ Feature: Get account
       |balance  |
       |missing  |
       |100      |
+
+  Scenario Outline: Check that optional fields were set correctly
+    Given the user inserts account details: 'Ivan Malusev' and 'EUR'
+    And the request account type value is '<accountType>'
+    And the request balance value is '<balance>'
+    And the request balance status is '<balanceStatus>'
+    When the user tries to create a new account
+    Then the new account is successfully created
+    And the created values for '<accountType>', '<balance>' and '<balanceStatus>' are correct
+    Examples:
+      |accountType|balance|balanceStatus|
+      |CLIENT     |10     |DR           |
