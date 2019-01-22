@@ -14,6 +14,7 @@ import cucumber.api.java8.En;
 import io.restassured.http.ContentType;
 import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
+import java.math.BigDecimal;
 import java.util.Currency;
 import java.util.UUID;
 import org.apache.http.HttpStatus;
@@ -67,6 +68,7 @@ public class AccountSteps implements En {
 
     Then("the new account is successfully created", () -> {
       response.then().statusCode(HttpStatus.SC_CREATED);
+      accountId = response.jsonPath().getLong("id");
     });
 
     Then("the account creation fails with Bad Request response", () -> {
@@ -154,6 +156,28 @@ public class AccountSteps implements En {
           body("$", hasKey("dateOpened")).
           body("$", hasKey("accountType")).
           body("$", hasKey("nameOnAccount"));
+    });
+
+    Given("the request account balance value is {string}", (String balance) -> {
+      if(!balance.equals("missing"))
+        createAccountRequest.setBalance(new BigDecimal(balance));
+    });
+
+    Then("the account balance is {string}", (String balance) -> {
+      JsonPath jsonPath =
+        given().
+          contentType(ContentType.JSON).
+          header("X-access-token", "Bearer " + accessToken).
+        when().
+          get(ApiPath.ACCOUNTS + "/" + accountId).
+        then().
+          statusCode(HttpStatus.SC_OK).extract().jsonPath();
+
+      if(balance.equals("missing")) {
+        assertThat(jsonPath.get("balance"), is("0.00"));
+      } else {
+        assertThat(jsonPath.get("balance"), is(new BigDecimal(balance).setScale(2, BigDecimal.ROUND_DOWN).toString()));
+      }
     });
   }
 

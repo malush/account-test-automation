@@ -20,3 +20,14 @@ Feature: Get account
     When the user tries to get the account
     Then the users account is successfully retrieved
     And the account response contains all required fields
+
+  Scenario Outline: Initial balance for new accounts
+    Given the user inserts account details: 'Ivan Malusev' and 'EUR'
+    And the request account balance value is '<balance>'
+    When the user tries to create a new account
+    Then the new account is successfully created
+    And the account balance is '<balance>'
+    Examples:
+      |balance  |
+      |missing  |
+      |100      |
