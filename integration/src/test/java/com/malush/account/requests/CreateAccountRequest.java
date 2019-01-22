@@ -10,6 +10,8 @@ public class CreateAccountRequest {
   private String nameOnAccount;
   private String currencyId;
   private BigDecimal balance;
+  private String accountType;
+  private String balanceStatus;
 
   public CreateAccountRequest(String nameOnAccount, String currencyId) {
     this.nameOnAccount = nameOnAccount;
@@ -38,5 +40,21 @@ public class CreateAccountRequest {
 
   public void setBalance(BigDecimal balance) {
     this.balance = balance;
+  }
+
+  public String getAccountType() {
+    return accountType;
+  }
+
+  public void setAccountType(String accountType) {
+    this.accountType = accountType;
+  }
+
+  public String getBalanceStatus() {
+    return balanceStatus;
+  }
+
+  public void setBalanceStatus(String balanceStatus) {
+    this.balanceStatus = balanceStatus;
   }
 }

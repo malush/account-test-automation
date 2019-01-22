@@ -73,3 +73,22 @@ Feature: Create account
       #Currently all currencies are supported (for example, just uncomment the line above and this
       #scenario will still not fail although it should).
       #After the issue is fixed this should only work for EUR but for any other currency it would fail
+
+  Scenario Outline: Test optional fields
+    Given the user inserts account details: 'Ivan Malusev' and 'EUR'
+    And the request account type value is '<accountType>'
+    And the request account balance value is '<balance>'
+    And the request balance status is '<balanceStatus>'
+    When the user tries to create a new account
+    Then the account creation reply status code is <statusCode>
+    Examples:
+      |accountType|balance|balanceStatus|statusCode|
+      |CLIENT     |       |             |201       |
+      |LEDGER     |       |             |201       |
+      |xyz        |       |             |400       |
+      |           |100    |             |201       |
+      |           |-100   |             |201       |
+      |           |0      |             |201       |
+      |           |       |DR           |201       |
+      |           |       |CR           |201       |
+      |           |       |xyz          |400       |

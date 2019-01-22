@@ -21,6 +21,8 @@ import org.apache.http.HttpStatus;
 
 public class AccountSteps implements En {
 
+  public static final String HEADER_ACCESS_TOKEN = "x-access-token";
+
   private Response response;
   private String accessToken;
   private CreateAccountRequest createAccountRequest;
@@ -60,7 +62,7 @@ public class AccountSteps implements En {
       response =
         given().
           contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + accessToken).
+          header(HEADER_ACCESS_TOKEN, "Bearer " + accessToken).
           body(createAccountRequest).
         when().
           post(ApiPath.ACCOUNTS);
@@ -94,7 +96,7 @@ public class AccountSteps implements En {
       response =
         given().
           contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + "wrongtoken").
+          header(HEADER_ACCESS_TOKEN, "Bearer " + "wrongtoken").
           body(createAccountRequestBody("test", "EUR")).
         when().
           post(ApiPath.ACCOUNTS);
@@ -104,7 +106,7 @@ public class AccountSteps implements En {
       accountId =
         given().
           contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + accessToken).
+          header(HEADER_ACCESS_TOKEN, "Bearer " + accessToken).
           body(createAccountRequestBody(nameOnAccount, currencyId)).
         when().
           post(ApiPath.ACCOUNTS).jsonPath().getLong("id");
@@ -120,17 +122,17 @@ public class AccountSteps implements En {
       response =
         given().
           contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + accessToken).
+          header(HEADER_ACCESS_TOKEN, "Bearer " + accessToken).
           body(new CreateAccountRequest(nameOnAccount, Currency.getInstance(supportedCurrency).getCurrencyCode())).
         when().
-          post("/accounts");
+          post(ApiPath.ACCOUNTS);
     });
 
     When("the user tries to get the account", () -> {
       response =
         given().
           contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + accessToken).
+          header(HEADER_ACCESS_TOKEN, "Bearer " + accessToken).
         when().
           get(ApiPath.ACCOUNTS + "/" + accountId);
     });
@@ -159,15 +161,25 @@ public class AccountSteps implements En {
     });
 
     Given("the request account balance value is {string}", (String balance) -> {
-      if(!balance.equals("missing"))
+      if(!balance.equals("missing") && !balance.isEmpty())
         createAccountRequest.setBalance(new BigDecimal(balance));
+    });
+
+    Given("the request account type value is {string}", (String accountType) -> {
+      if(!accountType.isEmpty())
+        createAccountRequest.setAccountType(accountType);
+    });
+
+    Given("the request balance status is {string}", (String balanceStatus) -> {
+      if(!balanceStatus.isEmpty())
+        createAccountRequest.setBalanceStatus(balanceStatus);
     });
 
     Then("the account balance is {string}", (String balance) -> {
       JsonPath jsonPath =
         given().
           contentType(ContentType.JSON).
-          header("X-access-token", "Bearer " + accessToken).
+          header(HEADER_ACCESS_TOKEN, "Bearer " + accessToken).
         when().
           get(ApiPath.ACCOUNTS + "/" + accountId).
         then().
@@ -178,6 +190,10 @@ public class AccountSteps implements En {
       } else {
         assertThat(jsonPath.get("balance"), is(new BigDecimal(balance).setScale(2, BigDecimal.ROUND_DOWN).toString()));
       }
+    });
+
+    Then("the account creation reply status code is {int}", (Integer statusCode) -> {
+      response.then().statusCode(statusCode);
     });
   }
 
