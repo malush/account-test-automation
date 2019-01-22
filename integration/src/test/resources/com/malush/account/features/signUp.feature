@@ -3,19 +3,29 @@ Feature: Sign up
   I want to be able to register a user profile with chosen credentials
 
 
-  Scenario: Successful sign up
-    When a user tries to register a new profile with valid data
+  Scenario Outline: Successful sign up
+    Given the user inserts '<name>' and '<password>'
+    When the user tries to register a new profile
     Then the user sign up is successful
+    Examples:
+      |name   |password  |
+      |malush |qwerty123 |
 
-  Scenario Outline: Missing fields
-    When the user tries to register a new profile with missing "<inputData>"
+  Scenario Outline: Missing or empty fields
+    Given the user inserts '<name>' and '<password>'
+    When the user tries to register a new profile
     Then the user sign up fails with Bad Request response
     Examples:
-    |inputData |
-    |name      |
-    |password  |
+      | name   | password  |
+      | null   | qwerty123 |
+      |        | qwerty123 |
+      | malush | null      |
+      | malush |           |
 
-  Scenario: User sign up fails for existing users
-    Given the user already exists in the system
-    When a user tries to register a new profile with valid data
+  Scenario Outline: User sign up fails for existing users
+    Given the user with '<name>' and '<password>' already exists in the system
+    When the user tries to register a new profile
     Then the user sign up fails with response indicating the conflict
+    Examples:
+      |name   |password  |
+      |malush |qwerty123 |

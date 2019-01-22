@@ -1,5 +1,6 @@
 package com.malush.account.step_definitions;
 
+import com.malush.account.requests.ApiPath;
 import com.malush.account.requests.SignUpRequest;
 import com.malush.account.repository.UserRepository;
 import cucumber.api.java8.En;
@@ -15,6 +16,7 @@ import static io.restassured.RestAssured.*;
 public class SignUpSteps implements En {
 
   private Response response;
+  private SignUpRequest signUpRequest;
 
   public SignUpSteps() {
 
@@ -24,32 +26,23 @@ public class SignUpSteps implements En {
 
     After(() -> {
       response = null;
+      signUpRequest = null;
     });
 
-    When("a user tries to register a new profile with valid data", () -> {
+    Given("the user inserts {string} and {string}", (String name, String password) -> {
+      signUpRequest = new SignUpRequest(name.equals("null") ? null : name, password.equals("null") ? null : password);
+    });
+
+    When("the user tries to register a new profile", () -> {
       response =
         given().
           contentType(ContentType.JSON).
-          body(new SignUpRequest("malush", "qwerty123")).
-        when().post("/sign-up");
+          body(signUpRequest).
+        when().post(ApiPath.SIGN_UP);
     });
 
     Then("the user sign up is successful", () -> {
       response.then().statusCode(HttpStatus.SC_CREATED);
-    });
-
-    When("the user tries to register a new profile with missing {string}", (String inputData) -> {
-      SignUpRequest signUpRequest;
-      if(inputData.equals("name"))
-        signUpRequest = new SignUpRequest("", "qwerty123");
-      else {
-        signUpRequest = new SignUpRequest("malush", "");
-      }
-      response =
-          given().
-            contentType(ContentType.JSON).
-            body(signUpRequest).
-          when().post("/sign-up");
     });
 
     Then("the user sign up fails with Bad Request response", () -> {
@@ -57,18 +50,18 @@ public class SignUpSteps implements En {
       assertThat(jsonPath.get("error"), is("Bad Request"));
     });
 
-    Given("the user already exists in the system", () ->
+    Given("the user with {string} and {string} already exists in the system", (String name, String password) ->
     {
+      signUpRequest = new SignUpRequest(name.equals("null") ? null : name, password.equals("null") ? null : password);
       given().
         contentType(ContentType.JSON).
-        body(new SignUpRequest("malush", "qwerty123")).
-      when().post("/sign-up").
-      then().statusCode(HttpStatus.SC_CREATED);
+        body(signUpRequest).log().all().
+      when().post(ApiPath.SIGN_UP).
+      then().statusCode(HttpStatus.SC_CREATED).log().all();
     });
 
     Then("the user sign up fails with response indicating the conflict", () -> {
       response.then().statusCode(HttpStatus.SC_CONFLICT);
     });
-
   }
 }
