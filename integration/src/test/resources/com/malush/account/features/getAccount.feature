@@ -6,11 +6,17 @@ Feature: Get account
     Given the user is logged in
 
 
-Scenario Outline: Get account successfully
-  Given the account with account details: '<nameOnAccount>' and '<currencyId>' already exists
-  When the user tries to get the account
-  Then the users account is successfully retrieved
-  And the account has the following details: '<nameOnAccount>' and '<currencyId>'
-  Examples:
-    |nameOnAccount|currencyId |
-    |Ivan Malusev |EUR        |
+  Scenario Outline: Get account successfully
+    Given the account with account details: '<nameOnAccount>' and '<currencyId>' already exists
+    When the user tries to get the account
+    Then the users account is successfully retrieved
+    And the account has the following details: '<nameOnAccount>' and '<currencyId>'
+    Examples:
+      |nameOnAccount|currencyId |
+      |Ivan Malusev |EUR        |
+
+  Scenario: Check account response fields
+    Given the account with account details: 'test' and 'EUR' already exists
+    When the user tries to get the account
+    Then the users account is successfully retrieved
+    And the account response contains all required fields

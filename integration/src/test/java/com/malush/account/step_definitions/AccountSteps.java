@@ -1,6 +1,7 @@
 package com.malush.account.step_definitions;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.hasKey;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -140,6 +141,19 @@ public class AccountSteps implements En {
       JsonPath jsonPath =  response.then().extract().jsonPath();
       assertThat(jsonPath.get("nameOnAccount"), is(nameOnAccount));
       assertThat(jsonPath.get("currencyId"), is(currencyId));
+    });
+
+    Then("the account response contains all required fields", () -> {
+      response.
+        then().
+          body("$", hasKey("id")).
+          body("$", hasKey("currencyId")).
+          body("$", hasKey("balance")).
+          body("$", hasKey("balanceStatus")).
+          body("$", hasKey("balanceTimestamp")).
+          body("$", hasKey("dateOpened")).
+          body("$", hasKey("accountType")).
+          body("$", hasKey("nameOnAccount"));
     });
   }
 
