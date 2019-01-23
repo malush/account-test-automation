@@ -80,7 +80,8 @@ public class LoadAccountSteps implements En {
 
   private LoadAccountRequest createLoadAccountRequestBody(String amount, String currencyId){
     return new LoadAccountRequest(
-        amount.equals("null") ? null : new BigDecimal(amount).setScale(2, BigDecimal.ROUND_DOWN),
+        (amount.isEmpty() ||
+        amount.equals("null")) ? null : new BigDecimal(amount).setScale(2, BigDecimal.ROUND_DOWN),
         currencyId.equals("null") ? null : currencyId
     );
   }
