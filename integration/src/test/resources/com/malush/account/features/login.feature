@@ -15,12 +15,12 @@ Feature: Login
     When a user successfully signs up
     Then the user is immediately granted access to the system
 
-  Scenario: Fail if user doesn't exist
+  Scenario: User doesn't exist
     Given an unknown user inserts login credentials
     When the user requests to login
     Then the access is forbidden
 
-  Scenario Outline: Fail if wrong password
+  Scenario Outline: Wrong password
     Given the user with '<name>' and '<password>' already exists in the system
     And the user inserts login credentials: '<name>' and '<wrongPassword>'
     When the user requests to login
@@ -29,7 +29,7 @@ Feature: Login
       |name   |password  | wrongPassword |
       |malush |qwerty123 | qwerty        |
 
-  Scenario Outline: Fail if required fields are empty or missing
+  Scenario Outline: Required fields are empty or missing
     Given the user inserts login credentials: '<name>' and '<password>'
     When the user requests to login
     Then the access is forbidden

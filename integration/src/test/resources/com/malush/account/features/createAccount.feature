@@ -24,33 +24,33 @@ Feature: Create account
       |null         |null       |
       |             |           |
 
-  Scenario: Fail if token is missing
+  Scenario: Access token missing
     When the user tries to create a new account without providing access token
-    Then the access to account resource is forbidden
+    Then the access to account operations is forbidden
 
-  Scenario: Fail if token is invalid
+  Scenario: Access token is invalid
     When the user tries to create a new account but provides an invalid token
-    Then the access to account resource is forbidden
+    Then the access to account operations is forbidden
 
-  Scenario Outline: Fail if account exists
+  Scenario Outline: Account already exists
     Given the account with account details: '<nameOnAccount>' and '<currencyId>' already exists
     And the user inserts account details: '<nameOnAccount>' and '<currencyId>'
     When the user tries to create a new account
-    Then the account creation fails with the response indicating the conflict
+    Then the account operation fails with the response indicating the conflict
     Examples:
       |nameOnAccount|currencyId |
       |Ivan Malusev |EUR        |
 
-  Scenario: Fail for invalid currency
+  Scenario: Invalid currency
     Given the user inserts account details: 'Ivan Malusev' and 'XYZ'
     When the user tries to create a new account
     Then the account creation fails with Bad Request response
 
-  Scenario Outline: Fail multiple currencies on one account
+  Scenario Outline: Multiple currencies on one account
     Given the account with account details: '<nameOnAccount>' and '<currencyId1>' already exists
     And the user inserts account details: '<nameOnAccount>' and '<currencyId2>'
     When the user tries to create a new account
-    Then the account creation fails with the response indicating the conflict
+    Then the account operation fails with the response indicating the conflict
     Examples:
       |nameOnAccount|currencyId1 |currencyId2 |
       |Ivan Malusev |EUR         |RSD         |
@@ -63,7 +63,7 @@ Feature: Create account
   # Line 22: should change from: if(!StringUtils.isBlank(value) || "EUR".equals(value))
   # to if(!StringUtils.isBlank(value) && "EUR".equals(value))
   # as the line 22 doesn't make any sense. It will always be true for any non empty value
-  Scenario Outline: Check supported currencies
+  Scenario Outline: Supported currencies
     When the user tries to add a new account for one of the supported currencies: '<supportedCurrency>'
     Then the new account is successfully created
     Examples:
@@ -74,21 +74,21 @@ Feature: Create account
       #scenario will still not fail although it should).
       #After the issue is fixed this should only work for EUR but for any other currency it would fail
 
-  Scenario Outline: Check supported optional fields
+  Scenario Outline: Supported optional fields
     Given the user inserts account details: 'Ivan Malusev' and 'EUR'
     And the request account type value is '<accountType>'
     And the request balance value is '<balance>'
     And the request balance status is '<balanceStatus>'
     When the user tries to create a new account
-    Then the account creation reply status code is <statusCode>
+    Then the account creation was '<statusCode>'
     Examples:
-      |accountType|balance|balanceStatus|statusCode|
-      |CLIENT     |       |             |201       |
-      |LEDGER     |       |             |201       |
-      |xyz        |       |             |400       |
-      |           |100    |             |201       |
-      |           |-100   |             |201       |
-      |           |0      |             |201       |
-      |           |       |DR           |201       |
-      |           |       |CR           |201       |
-      |           |       |xyz          |400       |
+      |accountType|balance|balanceStatus|statusCode   |
+      |CLIENT     |       |             |successful   |
+      |LEDGER     |       |             |successful   |
+      |xyz        |       |             |unsuccessful |
+      |           |100    |             |successful   |
+      |           |-100   |             |successful   |
+      |           |0      |             |successful   |
+      |           |       |DR           |successful   |
+      |           |       |CR           |successful   |
+      |           |       |xyz          |unsuccessful |

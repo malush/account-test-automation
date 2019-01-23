@@ -3,6 +3,7 @@ package com.malush.account.step_definitions;
 import com.malush.account.repository.UserRepository;
 import com.malush.account.requests.ApiPath;
 import com.malush.account.requests.LoginRequest;
+import com.malush.account.requests.SignUpRequest;
 import cucumber.api.java8.En;
 import static io.restassured.RestAssured.*;
 
@@ -15,6 +16,7 @@ public class LoginSteps implements En {
 
   private Response response;
   private LoginRequest loginRequestBody;
+  protected String accessToken;
 
 
   public LoginSteps() {
@@ -26,6 +28,7 @@ public class LoginSteps implements En {
     After(() -> {
       response = null;
       loginRequestBody = null;
+      accessToken = null;
     });
     
     Given("the user inserts login credentials: {string} and {string}", (String name, String password) -> {
@@ -66,6 +69,18 @@ public class LoginSteps implements En {
 
     Then("the access is forbidden", () -> {
       response.then().statusCode(HttpStatus.SC_FORBIDDEN);
+    });
+
+    Given("the user is logged in", () -> {
+      accessToken =
+        given().
+          contentType(ContentType.JSON).
+        body(new SignUpRequest("malush", "qwerty123")).
+          when().
+            post(ApiPath.SIGN_UP).
+          then().
+            statusCode(HttpStatus.SC_CREATED).
+            extract().jsonPath().get("access_token");
     });
   }
 

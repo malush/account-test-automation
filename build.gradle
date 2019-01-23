@@ -17,6 +17,7 @@ subprojects {
         testCompile group: 'junit', name: 'junit', version: junitVersion
         testCompile group: 'io.cucumber', name: 'cucumber-java8', version: cucumberVersion
         testCompile group: 'io.cucumber', name: 'cucumber-junit', version: cucumberVersion
+        testCompile group: 'io.cucumber', name: 'cucumber-picocontainer', version: cucumberVersion
         testCompile group: 'org.yaml', name: 'snakeyaml', version: snakeyamlengineVersion
     }
 }

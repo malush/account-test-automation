@@ -9,5 +9,7 @@ public final class ApiPath {
   public static final String SIGN_UP = "/sign-up";
   public static final String ACCESS_TOKENS = "/access-tokens";
   public static final String ACCOUNTS = "/accounts";
+  public static final String LOAD = "/load";
+  public static final String TRANSFERS = "/transfers";
 
 }
