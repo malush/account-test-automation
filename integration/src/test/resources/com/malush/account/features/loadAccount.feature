@@ -4,15 +4,15 @@ Feature: Load account
 
   Background:
     Given the user is logged in
-    And the debit account exists with '1000.00' 'EUR'
-    And the credit account exists with '100.00' 'EUR'
+    And the 'ledger' account exists with balance of '1000.00' 'EUR'
+    And the 'client' account exists with balance of '100.00' 'EUR'
 
   Scenario Outline: Load account successfully
-    Given the users load account amount input is '50' 'EUR'
-    When the user tries to load the credit account
-    Then the load account operation was successful
-    And the '<account>' account balance is '<balance>'
+    Given the user input for the amount to load is '50' 'EUR'
+    When the user tries to load the client account
+    Then the load account operation is successful
+    And the '<accountType>' account balance is '<balance>'
     Examples:
-      |account|balance|
-      |credit |50     |
-      |debit  |950    |
+      |accountType|balance|
+      |client     |50     |
+      |ledger     |1050    |

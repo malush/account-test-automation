@@ -20,8 +20,8 @@ public class LoadAccountSteps implements En {
   private CommonAccountSteps common;
 
   private LoadAccountRequest loadAccountRequest;
-  private long debitAccountId;
-  private long creditAccountId;
+  private long ledgerAccountId;
+  private long clientAccountId;
 
   public LoadAccountSteps(CommonAccountSteps common) {
 
@@ -30,69 +30,49 @@ public class LoadAccountSteps implements En {
 
     After(() -> {
       loadAccountRequest = null;
-      debitAccountId = 0L;
-      creditAccountId = 0L;
+      ledgerAccountId = 0L;
+      clientAccountId = 0L;
     });
 
-    Given("the debit account exists with {string} {string}", (String balance, String currencyId) -> {
-      debitAccountId =
+    Given("the {string} account exists with balance of {string} {string}", (String accountType, String balance, String currencyId) -> {
+      long accountId =
         given().
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
-          body(createAccountRequestBody(balance, currencyId, TestAccountType.DEBIT)).
+          body(createAccountRequestBody(balance, currencyId, accountType)).
         when().
           post(ApiPath.ACCOUNTS).
         then().
           statusCode(HttpStatus.SC_CREATED).extract().jsonPath().getLong("id");
+
+      setAccountIdForType(accountType, accountId);
     });
 
-    Given("the credit account exists with {string} {string}", (String balance, String currencyId) -> {
-      creditAccountId =
-        given().
-          contentType(ContentType.JSON).
-          header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
-          body(createAccountRequestBody(balance, currencyId, TestAccountType.CREDIT)).
-        when().
-          post(ApiPath.ACCOUNTS).
-        then().
-          statusCode(HttpStatus.SC_CREATED).extract().jsonPath().getLong("id");
-    });
-
-    Given("the users load account amount input is {string} {string}", (String amount, String currencyId) -> {
+    Given("the user input for the amount to load is {string} {string}", (String amount, String currencyId) -> {
       loadAccountRequest = createLoadAccountRequestBody(amount, currencyId);
     });
 
-    When("the user tries to load the credit account", () -> {
+    When("the user tries to load the client account", () -> {
       common.response =
         given().
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
           body(loadAccountRequest).
         when().
-          post(loadAccountResource(creditAccountId));
+          post(loadAccountResource(clientAccountId));
     });
 
-    Then("the load account operation was successful", () -> {
+    Then("the load account operation is successful", () -> {
       common.response.then().statusCode(HttpStatus.SC_OK);
     });
 
-    Then("the {string} account balance is {string}", (String requestedAccount, String amount) -> {
-
-      long accountId=0L;
-      if (requestedAccount.equalsIgnoreCase(TestAccountType.CREDIT.value)) {
-        accountId = creditAccountId;
-      } else if (requestedAccount.equalsIgnoreCase(TestAccountType.DEBIT.value)) {
-        accountId = debitAccountId;
-      } else {
-        fail("the requested account type should be one of the defined types in: " + TestAccountType.class.getName());
-      }
-
+    Then("the {string} account balance is {string}", (String accountType, String amount) -> {
       JsonPath jsonPath =
         given().
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
         when().
-          get(ApiPath.ACCOUNTS + "/" + accountId).
+          get(ApiPath.ACCOUNTS + "/" + getAccountIdForType(accountType)).
         then().extract().jsonPath();
 
       assertThat(jsonPath.get("balance"), is(new BigDecimal(amount).setScale(2, BigDecimal.ROUND_DOWN).toString()));
@@ -106,11 +86,12 @@ public class LoadAccountSteps implements En {
     );
   }
 
-  private CreateAccountRequest createAccountRequestBody(String balance, String currencyId, TestAccountType type) {
-    CreateAccountRequest account = new CreateAccountRequest(type.value + "account", currencyId);
-    account.setAccountType(type.equals(TestAccountType.DEBIT) ? "LEDGER" : "CLIENT" );
+  private CreateAccountRequest createAccountRequestBody(String balance, String currencyId, String accountType) {
+    validateAccountType(accountType);
+    CreateAccountRequest account = new CreateAccountRequest(accountType + "account", currencyId);
+    account.setAccountType(accountType.toUpperCase());
     account.setBalance(new BigDecimal(balance));
-    account.setBalanceStatus(type.equals(TestAccountType.DEBIT) ? "DR" : "CR");
+    account.setBalanceStatus(accountType.equals(AccountType.LEDGER) ? "DR" : "CR");
     return account;
   }
 
@@ -118,13 +99,39 @@ public class LoadAccountSteps implements En {
     return ApiPath.ACCOUNTS + "/" + accountId + ApiPath.LOAD;
   }
 
-  private enum TestAccountType {
-    DEBIT ("Debit"), CREDIT("Credit");
+  private enum AccountType {
+    LEDGER ("ledger"), CLIENT("client");
 
     private final String value;
 
-    private TestAccountType(String value) {
+    private AccountType(String value) {
       this.value = value;
     }
   }
+
+  private long getAccountIdForType(String accountType) {
+    validateAccountType(accountType);
+
+    if (accountType.equalsIgnoreCase(AccountType.CLIENT.value))
+      return clientAccountId;
+    else
+      return ledgerAccountId;
+  }
+
+  private void setAccountIdForType(String accountType, long accountId) {
+    validateAccountType(accountType);
+
+    if (accountType.equalsIgnoreCase(AccountType.CLIENT.value))
+      clientAccountId = accountId;
+    else
+      ledgerAccountId = accountId;
+  }
+
+  private void validateAccountType(String accountType) {
+    if (accountType.equalsIgnoreCase(AccountType.CLIENT.value)) return;
+    else if (accountType.equalsIgnoreCase(AccountType.LEDGER.value)) return;
+    else
+      fail("Wrong test parameter. The provided account type should be one of the defined types in: " + AccountType.class.getName());
+  }
+
 }
