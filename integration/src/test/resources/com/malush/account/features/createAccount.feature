@@ -92,3 +92,8 @@ Feature: Create account
       |           |       |DR           |successful   |
       |           |       |CR           |successful   |
       |           |       |xyz          |unsuccessful |
+
+  Scenario: Multiple Ledger accounts
+    Given the 'ledger' account exists with balance of '1000' 'EUR'
+    When the user tries to create a new ledger account
+    Then the account operation fails with the response indicating the conflict

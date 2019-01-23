@@ -7,6 +7,7 @@ import static org.junit.Assert.assertThat;
 import com.malush.account.requests.ApiPath;
 import com.malush.account.requests.CreateAccountRequest;
 import com.malush.account.requests.Headers;
+import com.malush.account.step_definitions.CommonAccountSteps.AccountType;
 import cucumber.api.java8.En;
 import io.restassured.http.ContentType;
 import java.util.Currency;
@@ -34,7 +35,7 @@ public class CreateAccountSteps implements En {
 
     Then("the new account is successfully created", () -> {
       common.response.then().statusCode(HttpStatus.SC_CREATED);
-      common.accountId = common.response.jsonPath().getLong("id");
+      common.clientAccountId = common.response.jsonPath().getLong("id");
     });
 
     Then("the account creation fails with Bad Request response", () -> {
@@ -88,6 +89,16 @@ public class CreateAccountSteps implements En {
         assertThat(result, is("successful"));
       else
         assertThat(result, is("unsuccessful"));
+    });
+
+    When("the user tries to create a new ledger account", () -> {
+      common.response =
+        given().
+          contentType(ContentType.JSON).
+          header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
+          body(common.createAccountRequestBody("1000.00", "EUR", AccountType.LEDGER.getValue())).
+        when().
+          post(ApiPath.ACCOUNTS);
     });
   }
 }
