@@ -16,19 +16,17 @@ import org.apache.http.HttpStatus;
 public class GetAccountSteps implements En {
 
   private CommonAccountSteps common;
-  private LoginSteps login;
 
-  public GetAccountSteps(CommonAccountSteps common, LoginSteps login) {
+  public GetAccountSteps(CommonAccountSteps common) {
 
     //PicoContainer injection
     this.common = common;
-    this.login = login;
 
     When("the user tries to get the account", () -> {
       common.response =
         given().
           contentType(ContentType.JSON).
-          header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
+          header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
         when().
           get(ApiPath.ACCOUNTS + "/" + common.accountId);
     });
@@ -60,7 +58,7 @@ public class GetAccountSteps implements En {
       JsonPath jsonPath =
         given().
           contentType(ContentType.JSON).
-          header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
+          header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
         when().
           get(ApiPath.ACCOUNTS + "/" + common.accountId).
         then().
@@ -77,7 +75,7 @@ public class GetAccountSteps implements En {
       JsonPath jsonPath =
           given().
             contentType(ContentType.JSON).
-            header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
+            header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
           when().
             get(ApiPath.ACCOUNTS + "/" + common.accountId).
           then().

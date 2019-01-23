@@ -17,7 +17,7 @@ public class CreateAccountSteps implements En {
 
   private CommonAccountSteps common;
 
-  public CreateAccountSteps(CommonAccountSteps common, LoginSteps login) {
+  public CreateAccountSteps(CommonAccountSteps common) {
 
     //PicoContainer injection
     this.common = common;
@@ -26,7 +26,7 @@ public class CreateAccountSteps implements En {
       common.response =
         given().
           contentType(ContentType.JSON).
-        header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
+        header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
           body(common.createAccountRequest).
         when().
           post(ApiPath.ACCOUNTS);
@@ -67,7 +67,7 @@ public class CreateAccountSteps implements En {
       common.response =
         given().
           contentType(ContentType.JSON).
-          header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
+          header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
           body(new CreateAccountRequest(nameOnAccount, Currency.getInstance(supportedCurrency).getCurrencyCode())).
         when().
           post(ApiPath.ACCOUNTS);
