@@ -67,16 +67,15 @@ public class LoadAccountSteps implements En {
     });
 
     Then("the {string} account balance is {string}", (String accountType, String amount) -> {
-      JsonPath jsonPath =
-        given().
-          contentType(ContentType.JSON).
-          header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
-        when().
-          get(ApiPath.ACCOUNTS + "/" + getAccountIdForType(accountType)).
-        then().extract().jsonPath();
-
+      JsonPath jsonPath = getAccount(accountType);
       assertThat(jsonPath.get("balance"), is(new BigDecimal(amount).setScale(2, BigDecimal.ROUND_DOWN).toString()));
     });
+
+    Then("the {string} account balance status is {string}", (String accountType, String balanceStatus) -> {
+      JsonPath jsonPath = getAccount(accountType);
+      assertThat(jsonPath.get("balanceStatus"), is(balanceStatus));
+    });
+
   }
 
   private LoadAccountRequest createLoadAccountRequestBody(String amount, String currencyId){
@@ -91,7 +90,7 @@ public class LoadAccountSteps implements En {
     CreateAccountRequest account = new CreateAccountRequest(accountType + "account", currencyId);
     account.setAccountType(accountType.toUpperCase());
     account.setBalance(new BigDecimal(balance));
-    account.setBalanceStatus(accountType.equals(AccountType.LEDGER) ? "DR" : "CR");
+    account.setBalanceStatus(accountType.equalsIgnoreCase(AccountType.LEDGER.value) ? "DR" : "CR");
     return account;
   }
 
@@ -107,6 +106,16 @@ public class LoadAccountSteps implements En {
     private AccountType(String value) {
       this.value = value;
     }
+  }
+
+  private JsonPath getAccount(String accountType) {
+    return
+      given().
+        contentType(ContentType.JSON).
+        header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
+      when().
+        get(ApiPath.ACCOUNTS + "/" + getAccountIdForType(accountType)).
+      then().extract().jsonPath();
   }
 
   private long getAccountIdForType(String accountType) {

@@ -12,7 +12,8 @@ Feature: Load account
     When the user tries to load the client account
     Then the load account operation is successful
     And the '<accountType>' account balance is '<balance>'
+    And the '<accountType>' account balance status is '<balanceStatus>'
     Examples:
-      |accountType|balance|
-      |client     |50     |
-      |ledger     |1050    |
+      |accountType|balance|balanceStatus|
+      |client     |50     |CR           |
+      |ledger     |950    |DR           |
