@@ -1,6 +1,6 @@
 Feature: Sign up
   As a new user of the system
-  I want to be able to register a user profile with chosen credentials
+  I want to be able to register with chosen credentials
 
 
   Scenario Outline: Successful sign up

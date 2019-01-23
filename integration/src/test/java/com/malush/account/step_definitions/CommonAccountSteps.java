@@ -74,18 +74,6 @@ public class CommonAccountSteps implements En {
       response.then().statusCode(HttpStatus.SC_NOT_FOUND);
     });
 
-    Given("the users account exists", () -> {
-      accountId =
-        given().
-          contentType(ContentType.JSON).
-          header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
-          body(createAccountRequestBody("Ivan Malusev", "EUR")).
-        when().
-          post(ApiPath.ACCOUNTS).
-        then().statusCode(HttpStatus.SC_CREATED).extract().jsonPath().getLong("id");
-    });
-
-
   }
 
   protected CreateAccountRequest createAccountRequestBody(String nameOnAccount, String currency){

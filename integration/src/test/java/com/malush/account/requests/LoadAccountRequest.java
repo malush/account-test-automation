@@ -2,12 +2,12 @@ package com.malush.account.requests;
 
 import java.math.BigDecimal;
 
-public class TopUpRequest {
+public class LoadAccountRequest {
 
   private BigDecimal amount;
   private String currencyId;
 
-  public TopUpRequest(BigDecimal amount, String currencyId) {
+  public LoadAccountRequest(BigDecimal amount, String currencyId) {
     this.amount = amount;
     this.currencyId = currencyId;
   }

@@ -64,11 +64,7 @@ public class GetAccountSteps implements En {
         then().
           statusCode(HttpStatus.SC_OK).extract().jsonPath();
 
-      if(balance.equals("missing")) {
-        assertThat(jsonPath.get("balance"), is("0.00"));
-      } else {
-        assertThat(jsonPath.get("balance"), is(new BigDecimal(balance).setScale(2, BigDecimal.ROUND_DOWN).toString()));
-      }
+      assertThat(jsonPath.get("balance"), is(balance));
     });
 
     Then("the created values for {string}, {string} and {string} are correct", (String accountType, String balance, String balanceStatus) -> {

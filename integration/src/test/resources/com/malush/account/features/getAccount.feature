@@ -15,9 +15,6 @@ Feature: Get account
       |nameOnAccount|currencyId |
       |Ivan Malusev |EUR        |
 
-  #In addition to the following scenario we need another one.
-  #The user should only be able to fetch his own account, but this feature is currently not supported
-  #Unless the application is only admin facing?
   Scenario: Unknown account number
     Given the user chooses the wrong account number
     When the user tries to get the account
@@ -29,16 +26,16 @@ Feature: Get account
     Then the users account is successfully retrieved
     And the account response contains all required fields
 
-  Scenario Outline: Initial balance for new accounts
+  Scenario Outline: Opening balance for new accounts
     Given the user inserts account details: 'Ivan Malusev' and 'EUR'
-    And the request balance value is '<balance>'
+    And the request balance value is '<reqBalance>'
     When the user tries to create a new account
     Then the new account is successfully created
-    And the account balance is '<balance>'
+    And the account balance is '<resBalance>'
     Examples:
-      |balance  |
-      |missing  |
-      |100      |
+      |reqBalance|resBalance|
+      |missing   |0.00      |
+      |100       |100.00    |
 
   Scenario Outline: Optional account response fields
     Given the user inserts account details: 'Ivan Malusev' and 'EUR'
