@@ -20,4 +20,9 @@ subprojects {
         testCompile group: 'io.cucumber', name: 'cucumber-picocontainer', version: cucumberVersion
         testCompile group: 'org.yaml', name: 'snakeyaml', version: snakeyamlengineVersion
     }
+
+    test {
+        testLogging.showStandardStreams = true
+        systemProperties System.getProperties()
+    }
 }
