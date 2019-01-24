@@ -137,9 +137,7 @@ public class CommonAccountSteps implements En {
   }
 
   protected void validateAccountType(String accountType) {
-    if (accountType.equalsIgnoreCase(AccountType.CLIENT.value)) return;
-    else if (accountType.equalsIgnoreCase(AccountType.LEDGER.value)) return;
-    else
+    if(!accountType.equalsIgnoreCase(AccountType.CLIENT.value) && !accountType.equalsIgnoreCase(AccountType.LEDGER.value))
       fail("Wrong test parameter. The provided account type should be one of the defined types in: " + AccountType.class.getName());
   }
 
@@ -160,23 +158,29 @@ public class CommonAccountSteps implements En {
       ledgerAccountId = accountId;
   }
 
-  private long getAccountIdForType(String accountType) {
+  private long getAccountIdForType(String accountType, String balanceStatus) {
     validateAccountType(accountType);
+    validateBalanceStatus(balanceStatus);
 
-    if (accountType.equalsIgnoreCase(AccountType.CLIENT.getValue()))
+    if (accountType.equalsIgnoreCase(AccountType.CLIENT.getValue()) && balanceStatus.equals("CR"))
       return clientCreditAccountId;
+    else if (accountType.equalsIgnoreCase(AccountType.CLIENT.getValue()) && balanceStatus.equals("DR"))
+      return clientDebitAccountId;
     else
       return ledgerAccountId;
   }
 
+  protected JsonPath getAccount (String accountType) {
+    return getAccount(accountType, "CR");
+  }
 
-  protected JsonPath getAccount(String accountType) {
+  protected JsonPath getAccount(String accountType, String balanceStatus) {
     return
       given().
         contentType(ContentType.JSON).
         header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
       when().
-        get(ApiPath.ACCOUNTS + "/" + getAccountIdForType(accountType)).
+        get(ApiPath.ACCOUNTS + "/" + getAccountIdForType(accountType, balanceStatus)).
       then().extract().jsonPath();
   }
 

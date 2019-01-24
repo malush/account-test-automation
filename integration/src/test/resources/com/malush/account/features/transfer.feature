@@ -10,6 +10,10 @@ Feature: Transfer between accounts
 
     Scenario: Successful transfer between accounts
       Given the user selects the transfer amount: '5.00'
-      And the user selects the transfer currency: 'USD'
+      And the user selects the transfer currency: 'EUR'
       And the user selects the transfer 'debit' account
       And the user selects the transfer 'credit' account
+      When the user tries to transfer between accounts
+      Then the transfer completed successfully
+      And the transfer 'debit' account balance is '105'
+      And the transfer 'credit' account balance is '35'
