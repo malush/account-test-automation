@@ -23,7 +23,9 @@ public class CommonAccountSteps implements En {
   protected Response response;
   protected CreateAccountRequest createAccountRequest;
   protected long ledgerAccountId;
-  protected long clientAccountId;
+  protected long clientCreditAccountId;
+  protected long clientDebitAccountId;
+  private int numberOfAccounts;
 
   public CommonAccountSteps(LoginSteps login) {
 
@@ -39,7 +41,9 @@ public class CommonAccountSteps implements En {
       response = null;
       createAccountRequest = null;
       ledgerAccountId = 0L;
-      clientAccountId = 0L;
+      clientCreditAccountId = 0L;
+      clientDebitAccountId = 0L;
+      numberOfAccounts = 0;
     });
 
     Given("the user inserts account details: {string} and {string}", (String nameOnAccount, String currency) -> {
@@ -52,7 +56,7 @@ public class CommonAccountSteps implements En {
     });
 
     Given("the account with account details: {string} and {string} already exists", (String nameOnAccount, String currencyId) -> {
-      clientAccountId =
+      clientCreditAccountId =
         given().
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
@@ -71,25 +75,31 @@ public class CommonAccountSteps implements En {
     });
 
     When("the user chooses the wrong account number", () -> {
-      clientAccountId = 0;
+      clientCreditAccountId = 0;
     });
 
     Then("the account cannot be found", () -> {
       response.then().statusCode(HttpStatus.SC_NOT_FOUND);
     });
 
-    Given("the {string} account exists with balance of {string} {string}", (String accountType, String balance, String currencyId) -> {
+    Given("the {string} account exists with balance of {string} {string} and balance status {string}",
+        (String accountType, String balance, String currencyId, String balanceStatus) -> {
+
       long accountId =
         given().
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + login.accessToken).
-          body(createAccountRequestBody(balance, currencyId, accountType)).
+          body(createAccountRequestBody(balance, currencyId, accountType, balanceStatus)).
         when().
           post(ApiPath.ACCOUNTS).
         then().
           statusCode(HttpStatus.SC_CREATED).extract().jsonPath().getLong("id");
 
-      setAccountIdForType(accountType, accountId);
+      setAccountIdForType(accountType, balanceStatus, accountId);
+    });
+
+    Then("the account operation fails because of internal server error", () -> {
+      response.then().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     });
 
   }
@@ -103,12 +113,12 @@ public class CommonAccountSteps implements En {
     );
   }
 
-  protected CreateAccountRequest createAccountRequestBody(String balance, String currencyId, String accountType) {
+  protected CreateAccountRequest createAccountRequestBody(String balance, String currencyId, String accountType, String balanceStatus) {
     validateAccountType(accountType);
-    CreateAccountRequest account = new CreateAccountRequest(accountType + "account", currencyId);
+    CreateAccountRequest account = new CreateAccountRequest(accountType + "account" + numberOfAccounts++, currencyId);
     account.setAccountType(accountType.toUpperCase());
     account.setBalance(new BigDecimal(balance));
-    account.setBalanceStatus(accountType.equalsIgnoreCase(AccountType.LEDGER.value) ? "DR" : "CR");
+    account.setBalanceStatus(balanceStatus);
     return account;
   }
 
@@ -133,11 +143,19 @@ public class CommonAccountSteps implements En {
       fail("Wrong test parameter. The provided account type should be one of the defined types in: " + AccountType.class.getName());
   }
 
-  private void setAccountIdForType(String accountType, long accountId) {
-    validateAccountType(accountType);
+  private void validateBalanceStatus(String balanceStatus) {
+    if(!balanceStatus.equals("DR") && !balanceStatus.equals("CR"))
+      fail("Wrong test parameter. The provided balance status is not correct.");
+  }
 
-    if (accountType.equalsIgnoreCase(AccountType.CLIENT.getValue()))
-      clientAccountId = accountId;
+  private void setAccountIdForType(String accountType, String balanceStatus, long accountId) {
+    validateAccountType(accountType);
+    validateBalanceStatus(balanceStatus);
+
+    if (accountType.equalsIgnoreCase(AccountType.CLIENT.getValue()) && balanceStatus.equals("CR"))
+      clientCreditAccountId = accountId;
+    else if (accountType.equalsIgnoreCase(AccountType.CLIENT.getValue()) && balanceStatus.equals("DR"))
+      clientDebitAccountId = accountId;
     else
       ledgerAccountId = accountId;
   }
@@ -146,7 +164,7 @@ public class CommonAccountSteps implements En {
     validateAccountType(accountType);
 
     if (accountType.equalsIgnoreCase(AccountType.CLIENT.getValue()))
-      return clientAccountId;
+      return clientCreditAccountId;
     else
       return ledgerAccountId;
   }

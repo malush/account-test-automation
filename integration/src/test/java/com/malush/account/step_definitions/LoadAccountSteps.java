@@ -39,7 +39,7 @@ public class LoadAccountSteps implements En {
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
           body(loadAccountRequest).
         when().
-          post(loadAccountResource(common.clientAccountId));
+          post(loadAccountResource(common.clientCreditAccountId));
     });
 
     Then("the load account operation is successful", () -> {

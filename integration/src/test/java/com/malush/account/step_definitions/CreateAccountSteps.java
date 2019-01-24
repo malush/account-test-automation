@@ -35,7 +35,7 @@ public class CreateAccountSteps implements En {
 
     Then("the new account is successfully created", () -> {
       common.response.then().statusCode(HttpStatus.SC_CREATED);
-      common.clientAccountId = common.response.jsonPath().getLong("id");
+      common.clientCreditAccountId = common.response.jsonPath().getLong("id");
     });
 
     Then("the account creation fails with Bad Request response", () -> {
@@ -96,7 +96,7 @@ public class CreateAccountSteps implements En {
         given().
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
-          body(common.createAccountRequestBody("1000.00", "EUR", AccountType.LEDGER.getValue())).
+          body(common.createAccountRequestBody("1000.00", "EUR", AccountType.LEDGER.getValue(), "DR")).
         when().
           post(ApiPath.ACCOUNTS);
     });

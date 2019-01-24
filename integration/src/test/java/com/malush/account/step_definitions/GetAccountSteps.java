@@ -28,7 +28,7 @@ public class GetAccountSteps implements En {
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
         when().
-          get(ApiPath.ACCOUNTS + "/" + common.clientAccountId);
+          get(ApiPath.ACCOUNTS + "/" + common.clientCreditAccountId);
     });
 
     Then("the users account is successfully retrieved", () -> {
@@ -60,7 +60,7 @@ public class GetAccountSteps implements En {
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
         when().
-          get(ApiPath.ACCOUNTS + "/" + common.clientAccountId).
+          get(ApiPath.ACCOUNTS + "/" + common.clientCreditAccountId).
         then().
           statusCode(HttpStatus.SC_OK).extract().jsonPath();
 
@@ -73,7 +73,7 @@ public class GetAccountSteps implements En {
             contentType(ContentType.JSON).
             header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
           when().
-            get(ApiPath.ACCOUNTS + "/" + common.clientAccountId).
+            get(ApiPath.ACCOUNTS + "/" + common.clientCreditAccountId).
           then().
             statusCode(HttpStatus.SC_OK).extract().jsonPath();
 

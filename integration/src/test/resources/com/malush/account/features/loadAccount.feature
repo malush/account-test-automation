@@ -4,8 +4,8 @@ Feature: Load account
 
   Background:
     Given the user is logged in
-    And the 'ledger' account exists with balance of '1000.00' 'EUR'
-    And the 'client' account exists with balance of '100.00' 'EUR'
+    And the 'ledger' account exists with balance of '1000.00' 'EUR' and balance status 'DR'
+    And the 'client' account exists with balance of '100.00' 'EUR' and balance status 'CR'
 
   Scenario Outline: Load account successfully
     Given the user input for the amount to load is '<loadAmount>' 'EUR'
@@ -37,3 +37,13 @@ Feature: Load account
       |100.00       |           |
       |null         |null       |
       |             |           |
+
+
+  #This is probably a bug as it seems this hasn't been implemented fully.
+  #Instead of the internal error the server should
+  #not allow the creation of another ledger account if one already exists
+  Scenario: Two ledger accounts
+    Given the 'ledger' account exists with balance of '1000.00' 'EUR' and balance status 'DR'
+    And the user input for the amount to load is '20' 'EUR'
+    When the user tries to load the client account
+    Then the account operation fails because of internal server error

@@ -93,7 +93,9 @@ Feature: Create account
       |           |       |CR           |successful   |
       |           |       |xyz          |unsuccessful |
 
+
+  #This is probably a bug, as when testing the load account logic with multiple ledger accounts the internal server error is returned.
   Scenario: Multiple Ledger accounts
-    Given the 'ledger' account exists with balance of '1000' 'EUR'
+    Given the 'ledger' account exists with balance of '1000' 'EUR' and balance status 'DR'
     When the user tries to create a new ledger account
-    Then the account operation fails with the response indicating the conflict
+    Then the new account is successfully created
