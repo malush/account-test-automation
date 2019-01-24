@@ -66,12 +66,12 @@ public class TransferSteps implements En {
           contentType(ContentType.JSON).
           header(Headers.ACCESS_TOKEN, Headers.BEARER + common.login.accessToken).
           body(transferRequest).
-        when().log().all().
+        when().
           post(ApiPath.TRANSFERS);
     });
 
     Then("the transfer completed successfully", () -> {
-      common.response.then().log().all().statusCode(HttpStatus.SC_OK);
+      common.response.then().statusCode(HttpStatus.SC_OK);
     });
 
     Then("the transfer {string} account balance is {string}", (String accountBalanceStatus, String balance) -> {
@@ -87,7 +87,6 @@ public class TransferSteps implements En {
 
       assertThat(jsonPath.get("balance"), is(new BigDecimal(balance).setScale(2, BigDecimal.ROUND_DOWN).toString()));
     });
-
 
   }
 }

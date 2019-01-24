@@ -28,7 +28,7 @@ Feature: Load account
   Scenario Outline: Missing or empty fields
     Given the user input for the amount to load is '<loadAmount>' '<currencyId>'
     When the user tries to load the client account
-    Then the account creation fails with Bad Request response
+    Then the request fails with Bad Request response
     Examples:
       |loadAmount   |currencyId |
       |null         |EUR        |

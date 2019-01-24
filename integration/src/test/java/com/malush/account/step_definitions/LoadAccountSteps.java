@@ -46,11 +46,6 @@ public class LoadAccountSteps implements En {
       common.response.then().statusCode(HttpStatus.SC_OK);
     });
 
-    Then("the {string} account balance is {string}", (String accountType, String amount) -> {
-      JsonPath jsonPath = common.getAccount(accountType);
-      assertThat(jsonPath.get("balance"), is(new BigDecimal(amount).setScale(2, BigDecimal.ROUND_DOWN).toString()));
-    });
-
     Then("the {string} account balance status is {string}", (String accountType, String balanceStatus) -> {
       JsonPath jsonPath = common.getAccount(accountType);
       assertThat(jsonPath.get("balanceStatus"), is(balanceStatus));

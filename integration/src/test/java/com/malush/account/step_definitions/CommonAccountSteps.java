@@ -102,6 +102,16 @@ public class CommonAccountSteps implements En {
       response.then().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR);
     });
 
+    Then("the {string} account balance is {string}", (String accountType, String amount) -> {
+      JsonPath jsonPath = getAccount(accountType);
+      assertThat(jsonPath.get("balance"), is(new BigDecimal(amount).setScale(2, BigDecimal.ROUND_DOWN).toString()));
+    });
+
+    Then("the request fails with Bad Request response", () -> {
+      response.then().statusCode(HttpStatus.SC_BAD_REQUEST);
+      assertThat(response.jsonPath().get("error"), is("Bad Request"));
+    });
+
   }
 
 

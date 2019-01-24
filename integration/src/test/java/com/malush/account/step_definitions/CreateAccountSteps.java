@@ -38,11 +38,6 @@ public class CreateAccountSteps implements En {
       common.clientCreditAccountId = common.response.jsonPath().getLong("id");
     });
 
-    Then("the account creation fails with Bad Request response", () -> {
-      common.response.then().statusCode(HttpStatus.SC_BAD_REQUEST);
-      assertThat(common.response.jsonPath().get("error"), is("Bad Request"));
-    });
-
     When("the user tries to create a new account without providing access token", () -> {
       common.response =
         given().

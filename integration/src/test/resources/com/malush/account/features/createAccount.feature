@@ -14,7 +14,7 @@ Feature: Create account
   Scenario Outline: Missing or empty fields
     Given the user inserts account details: '<nameOnAccount>' and '<currencyId>'
     When the user tries to create a new account
-    Then the account creation fails with Bad Request response
+    Then the request fails with Bad Request response
     Examples:
       |nameOnAccount|currencyId |
       |null         |EUR        |
@@ -44,7 +44,7 @@ Feature: Create account
   Scenario: Invalid currency
     Given the user inserts account details: 'Ivan Malusev' and 'XYZ'
     When the user tries to create a new account
-    Then the account creation fails with Bad Request response
+    Then the request fails with Bad Request response
 
   Scenario Outline: Multiple currencies on one account
     Given the account with account details: '<nameOnAccount>' and '<currencyId1>' already exists
